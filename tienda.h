@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include "producto.h"
+#include "factura.h"
 
 #define IVA 12
 
@@ -23,13 +24,25 @@ private slots:
 
     void on_btnAgregar_released();
 
+    void on_btnFacturar_pressed();
+
+
 private:
     Ui::Tienda *ui;
     QList<Producto*> m_productos;
+    QString m_detalles;
+
     void cargarProductos();
     float m_subtotal;
-
+    float iva;
+    float total;
+    int contador=0;
+    bool checkVacio();
+    void enviarDatosdeCompra();
     void calcular(float stProducto);
+    void limpiar();
+
+
 
 };
 #endif // TIENDA_H

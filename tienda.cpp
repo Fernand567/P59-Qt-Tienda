@@ -11,15 +11,15 @@ Tienda::Tienda(QWidget *parent)
     // Lista de productos
     cargarProductos();
     // Mostrar los productos en el combo
-    foreach(Producto *p, m_productos){
+    foreach (Producto *p, m_productos){
         ui->inProducto->addItem(p->nombre());
     }
-    //Configurar cabecera de la tabla
-    QStringList cabecera ={"Cantidad","Producto","P. unitario","Subtotal"};
+    // Configurar cabecera de la tabla
+    QStringList cabecera = {"Cantidad", "Producto", "P. unitario", "Subtotal"};
     ui->outDetalle->setColumnCount(4);
     ui->outDetalle->setHorizontalHeaderLabels(cabecera);
-    m_subtotal=0;
-
+    // Establecer el subtotal a 0
+    m_subtotal = 0;
 }
 
 Tienda::~Tienda()
@@ -39,16 +39,89 @@ void Tienda::cargarProductos()
     //podria leerse de una base de datos, de un archivo o incluso de internet
 }
 
+bool Tienda::checkVacio()
+{
+    if(ui->inCedula->text()==""){
+        ui->inCedula->setStyleSheet("QLineEdit{ background-color: red}");
+    }else{
+        ui->inCedula->setStyleSheet("QLineEdit{ background-color: green}");
+    }
+    if(ui->inNombre->text()==""){
+        ui->inNombre->setStyleSheet("QLineEdit{ background-color: red}");
+    }else{
+        ui->inNombre->setStyleSheet("QLineEdit{ background-color: green}");
+    }
+    if(ui->inTelefono->text()==""){
+        ui->inTelefono->setStyleSheet("QLineEdit{ background-color: red}");
+    }else{
+        ui->inTelefono->setStyleSheet("QLineEdit{ background-color: green}");
+    }
+    if(ui->inEmail->text()==""){
+        ui->inEmail->setStyleSheet("QLineEdit{ background-color: red}");
+    }else{
+        ui->inEmail->setStyleSheet("QLineEdit{ background-color: green}");
+    }
+    if(ui->inDireccion->toPlainText()==""){
+        ui->inDireccion->setStyleSheet("QPlainTextEdit {background-color: red}");
+    }else{
+        ui->inDireccion->setStyleSheet("QPlainTextEdit {background-color: green}");
+    }
+    if(ui->inCedula->text()=="" || ui->inNombre->text()=="" || ui->inTelefono->text()=="" || ui->inEmail->text()==""||ui->inDireccion->toPlainText()==""){
+        return false;
+    }else{
+        return true;
+    }
+
+}
+
+void Tienda::enviarDatosdeCompra()
+{
+    int filas=ui->outDetalle->rowCount();
+    QString detalles="";
+    while(contador!=filas){
+        detalles+="\t"+ui->outDetalle->item(contador,0)->text()+"\t   "+
+                ui->outDetalle->item(contador,1)->text()+"\t          "+
+                ui->outDetalle->item(contador,2)->text()+"\t                  "+
+                ui->outDetalle->item(contador,3)->text()+"\t\t\n";
+
+        contador++;
+    }
+    m_detalles=detalles;
+}
+
 void Tienda::calcular(float stProducto)
 {
     // Calcular valores
     m_subtotal+=stProducto;
-    float iva=m_subtotal * IVA / 100;
-    float total =m_subtotal + iva;
+    iva=m_subtotal * IVA / 100;
+    total =m_subtotal + iva;
     // mostrar valores en GUI
     ui->outSubtotal->setText("$" + QString::number(m_subtotal,'f',2));
     ui->outIva->setText("$" + QString::number(iva,'f',2));
     ui->outTotal->setText("$" + QString::number(total,'f',2));
+}
+
+void Tienda::limpiar()
+{
+    ui->inCedula->setText("");
+    ui->inNombre->setText("");
+    ui->inTelefono->setText("");
+    ui->inEmail->setText("");
+    ui->inDireccion->setPlainText("");
+    ui->outDetalle->removeRow(0);
+    ui->outDetalle->removeRow(0);
+    ui->outDetalle->removeRow(0);
+    ui->outSubtotal->setText("$ 0.00");
+    ui->outIva->setText("$ 0.00");
+    ui->outTotal->setText("$ 0.00");
+    ui->inCedula->setStyleSheet("QLineEdit{ background-color: white}");
+    ui->inNombre->setStyleSheet("QLineEdit{ background-color: white}");
+    ui->inTelefono->setStyleSheet("QLineEdit{ background-color: white}");
+    ui->inEmail->setStyleSheet("QLineEdit{ background-color: white}");
+    ui->inDireccion->setStyleSheet("QPlainTextEdit {background-color: white}");
+
+
+
 }
 
 
@@ -92,3 +165,21 @@ void Tienda::on_btnAgregar_released()
 
 }
 
+
+void Tienda::on_btnFacturar_pressed()
+{
+    if(checkVacio()==true){
+    Factura *factura=new Factura(this);
+        enviarDatosdeCompra();
+        factura->datosFactura(ui->inCedula->text(),ui->inNombre->text(),
+                              ui->inTelefono->text(),ui->inEmail->text(),
+                              ui->inDireccion->toPlainText(),m_detalles);
+        factura->ValoresFactura(m_subtotal,iva,total);
+    if(contador !=0){
+     factura->cargarDatos();
+    factura->exec();
+    limpiar();
+}
+}
+
+}

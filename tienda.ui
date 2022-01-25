@@ -13,6 +13,10 @@
   <property name="windowTitle">
    <string>Tienda</string>
   </property>
+  <property name="windowIcon">
+   <iconset resource="Recursos.qrc">
+    <normaloff>:/Recursos/tienda.png</normaloff>:/Recursos/tienda.png</iconset>
+  </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QHBoxLayout" name="horizontalLayout_2">
     <item>
@@ -331,6 +335,8 @@ color: rgb(170, 0, 0);</string>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
  </widget>
- <resources/>
+ <resources>
+  <include location="Recursos.qrc"/>
+ </resources>
  <connections/>
 </ui>
