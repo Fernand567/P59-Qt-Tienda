@@ -45,21 +45,14 @@ void Factura::cargarDatos()
     ui->outIvaF->setText("$" + QString::number(c_iva,'f',2));
     ui->outTotalF->setText("$" + QString::number(c_total,'f',2));
     fecha= QDate::currentDate().toString(Qt::ISODate);
-    //fecha=QDateTime::currentDateTime().toString(Qt::ISODate);
     ui->outFecha->setText(fecha);
-
-    hora=QTime::currentTime().toString();
-
-
-
-
-
+    fechahora=QDateTime::currentDateTime().toString("ddMMyyyy_hhmmss");
 }
 
 void Factura::on_btnImprimir_clicked()
 {
 
-    QFile archivo("D:/Segundo semestre Salesiana/Programacion orientada a objetos/Nueva carpeta/Tienda/Facturas/"+fecha);
+    QFile archivo("D:/Segundo semestre Salesiana/Programacion orientada a objetos/Nueva carpeta/Tienda/Facturas/"+fechahora);
 
     if(archivo.open(QFile::WriteOnly | QFile::Truncate)){
     QTextStream salida(&archivo);
@@ -71,7 +64,7 @@ void Factura::on_btnImprimir_clicked()
     salida.operator<<("Datos del cliente\n\n");
     salida.operator<<("Cliente: "+c_nombre+"\t\t"+ "RUC/CI: "+c_cedula+"\n");
     salida.operator<<("Direccion: "+c_direccion+"\t\t"+ "Telefono: "+ c_telefono+"\n");
-    salida.operator<<("Email: "+c_email+"\n");
+    salida.operator<<("Email: "+c_email+"\t\t"+ "Fecha: "+ fecha+"\n");
     salida.operator<<("\n-------------------------------------------------------------------\n");
     salida.operator<<("Forma de pago: Efectivo");
     salida.operator<<("\n-------------------------------------------------------------------\n");
@@ -82,6 +75,9 @@ void Factura::on_btnImprimir_clicked()
     salida.operator<<("Iva(12%):  \t\t"+("$" + QString::number(c_iva,'f',2))+"\n");
     salida.operator<<("TOTAL:     \t\t"+("$" + QString::number(c_total,'f',2))+"\n\n");
     salida.operator<<("\tGracias por confiar en nosotros :)");
+
+    QMessageBox::information(this,"Guardar datos",
+                             "Los datos han sido guardados exitosamente");
     }else{
         QMessageBox::warning(this,
                              "Guardar datos",

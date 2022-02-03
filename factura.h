@@ -35,7 +35,6 @@ private:
 
     QString fechahora;
     QString fecha;
-    QString hora;
     QString c_detalles;
     QString c_cedula;
     QString c_nombre;
@@ -45,6 +44,7 @@ private:
     float c_subtotal;
     float c_iva;
     float c_total;
+
 };
 
 #endif // FACTURA_H

@@ -31,6 +31,7 @@ private:
     Ui::Tienda *ui;
     QList<Producto*> m_productos;
     QString m_detalles;
+    QString Datos="";
 
     void cargarProductos();
     float m_subtotal;
@@ -41,6 +42,7 @@ private:
     void enviarDatosdeCompra();
     void calcular(float stProducto);
     void limpiar();
+    bool validarCedula(QString as);
 
 
 

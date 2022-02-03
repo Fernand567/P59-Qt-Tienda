@@ -25,6 +25,10 @@
   <property name="windowTitle">
    <string>Dialog</string>
   </property>
+  <property name="windowIcon">
+   <iconset>
+    <normaloff>:/Recursos/factura.png</normaloff>:/Recursos/factura.png</iconset>
+  </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
     <widget class="QWidget" name="widget" native="true">
@@ -155,7 +159,7 @@ p, li { white-space: pre-wrap; }
         </rect>
        </property>
        <property name="text">
-        <string>Subtototal</string>
+        <string>Subtotal</string>
        </property>
       </widget>
       <widget class="QWidget" name="widget_8" native="true">

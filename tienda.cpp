@@ -15,7 +15,7 @@ Tienda::Tienda(QWidget *parent)
         ui->inProducto->addItem(p->nombre());
     }
     // Configurar cabecera de la tabla
-    QStringList cabecera = {"Cantidad", "Producto", "P. unitario", "Subtotal"};
+    QStringList cabecera = {tr("Cantidad"), tr("Producto"), tr("P. unitario"), tr("Subtotal")};
     ui->outDetalle->setColumnCount(4);
     ui->outDetalle->setHorizontalHeaderLabels(cabecera);
     // Establecer el subtotal a 0
@@ -33,19 +33,18 @@ Tienda::~Tienda()
 void Tienda::cargarProductos()
 {
     //crear productos quemados en el codigo
-    m_productos.append(new Producto(1,"Leche", 0.80));
-    m_productos.append(new Producto(2,"Pan",0.15));
-    m_productos.append(new Producto(3,"Queso",2.50));
+    m_productos.append(new Producto(1,tr("Leche"), 0.80));
+    m_productos.append(new Producto(2,tr("Pan"),0.15));
+    m_productos.append(new Producto(3,tr("Queso"),2.50));
     //podria leerse de una base de datos, de un archivo o incluso de internet
 }
 
 bool Tienda::checkVacio()
 {
-    if(ui->inCedula->text()==""){
-        ui->inCedula->setStyleSheet("QLineEdit{ background-color: red}");
-    }else{
-        ui->inCedula->setStyleSheet("QLineEdit{ background-color: green}");
-    }
+    if(validarCedula(ui->inCedula->text())==true && ui->inCedula->text()!="9999999999"){
+
+    ui->inCedula->setStyleSheet("QLineEdit{ background-color: green}");
+
     if(ui->inNombre->text()==""){
         ui->inNombre->setStyleSheet("QLineEdit{ background-color: red}");
     }else{
@@ -68,10 +67,19 @@ bool Tienda::checkVacio()
     }
     if(ui->inCedula->text()=="" || ui->inNombre->text()=="" || ui->inTelefono->text()=="" || ui->inEmail->text()==""||ui->inDireccion->toPlainText()==""){
         return false;
-    }else{
+            }
+    if(ui->inCedula->text()!="" && ui->inNombre->text()!="" && ui->inTelefono->text()!="" && ui->inEmail->text()!="" && ui->inDireccion->toPlainText()!=""){
         return true;
     }
-
+    }else if(ui->inCedula->text()=="9999999999"){
+        return true;
+    }else{
+    if(validarCedula(ui->inCedula->text())==false){
+    ui->inCedula->setStyleSheet("QLineEdit{ background-color: red}");
+        return false;
+    }
+    }
+    return true;
 }
 
 void Tienda::enviarDatosdeCompra()
@@ -108,9 +116,17 @@ void Tienda::limpiar()
     ui->inTelefono->setText("");
     ui->inEmail->setText("");
     ui->inDireccion->setPlainText("");
+    int rows=ui->outDetalle->rowCount();
+    while(rows!=-1){
+        ui->outDetalle->removeRow(rows);
+        rows--;
+    }
+    /*ui->outDetalle->removeRow(0);
     ui->outDetalle->removeRow(0);
-    ui->outDetalle->removeRow(0);
-    ui->outDetalle->removeRow(0);
+    ui->outDetalle->removeRow(0);*/
+    m_subtotal=0;
+    iva=0;
+    total=0;
     ui->outSubtotal->setText("$ 0.00");
     ui->outIva->setText("$ 0.00");
     ui->outTotal->setText("$ 0.00");
@@ -119,11 +135,141 @@ void Tienda::limpiar()
     ui->inTelefono->setStyleSheet("QLineEdit{ background-color: white}");
     ui->inEmail->setStyleSheet("QLineEdit{ background-color: white}");
     ui->inDireccion->setStyleSheet("QPlainTextEdit {background-color: white}");
+    m_detalles="";
+    contador=0;
+
 
 
 
 }
 
+bool Tienda::validarCedula(QString as)
+{
+        bool est = true;
+        int vcedula[10];
+        int vPar[4];
+        int vImpar[5]={0};
+        int sumaPar=0;
+        int sumaImpar=0;
+        int total;
+        int nveri;
+
+        double nu;
+
+        if(as=="9999999999"){
+            return true;
+        }
+
+        do
+        {
+
+            nu=as.toInt();
+            if(nu<100000000 || nu>9999999999)
+            {
+
+                est=false;
+                break;
+            }
+
+
+            //Separar string
+            QString p1=as.mid(0,1);
+            QString p2=as.mid(1,1);
+            QString p3=as.mid(2,1);
+            QString p4=as.mid(3,1);
+            QString p5=as.mid(4,1);
+            QString p6=as.mid(5,1);
+            QString p7=as.mid(6,1);
+            QString p8=as.mid(7,1);
+            QString p9=as.mid(8,1);
+            QString p10=as.mid(9,1);
+
+            //Transformar string
+            vcedula[0]=p1.toInt();
+            vcedula[1]=p2.toInt();
+            vcedula[2]=p3.toInt();
+            vcedula[3]=p4.toInt();
+            vcedula[4]=p5.toInt();
+            vcedula[5]=p6.toInt();
+            vcedula[6]=p7.toInt();
+            vcedula[7]=p8.toInt();
+            vcedula[8]=p9.toInt();
+            vcedula[9]=p10.toInt();
+
+            if(vcedula[0]>2)
+            {
+
+                est = false;
+                break;
+            }
+
+            //Pares
+            vPar[0]=vcedula[1];
+            vPar[1]=vcedula[3];
+            vPar[2]=vcedula[5];
+            vPar[3]=vcedula[7];
+            //Impares
+            vImpar[0]=vcedula[0];
+            vImpar[1]=vcedula[2];
+            vImpar[2]=vcedula[4];
+            vImpar[3]=vcedula[6];
+            vImpar[4]=vcedula[8];
+
+
+            //Punto 2. Multiplicacion impar
+            for(int i=0; i<5; i++)
+            {
+                vImpar[i]=vImpar[i]*2;
+                if(vImpar[i]>9)
+                {
+                    vImpar[i]=vImpar[i]-9;
+                }
+                sumaImpar += vImpar[i];
+            }
+            //Punto 3. Sumar los pares
+            for(int i=0; i<4; i++)
+            {
+                sumaPar += vPar[i];
+            }
+
+            total = sumaPar + sumaImpar;
+
+            //Punto 4. Se obtiene el modulo;
+
+            nveri = total%10;
+
+
+            //Punto 5. Numero verificador
+            if(nveri==0)
+            {
+                if(nveri==vcedula[9])
+                {
+                    est=true;
+                    break;
+                }else
+                {
+                    est=false;
+                    break;
+                }
+            }else if(nveri !=0)
+            {
+                nveri=10-nveri;
+
+                if(nveri==vcedula[9])
+                {
+                    est=true;
+                    break;
+                }else
+                {
+
+                    est=false;
+                    break;
+                }
+            }
+
+        }while(nu<100000000 || nu>9999999999 || vcedula[0]>2);
+        return est;
+}
 
 void Tienda::on_inProducto_currentIndexChanged(int index)
 {
@@ -135,7 +281,6 @@ void Tienda::on_inProducto_currentIndexChanged(int index)
     ui->inCantidad->setValue(0);
 
 }
-
 
 void Tienda::on_btnAgregar_released()
 {
@@ -161,25 +306,35 @@ void Tienda::on_btnAgregar_released()
     ui->inProducto->setFocus();
     // actualizar subtotoales
     calcular(subtotal);
-
-
 }
-
 
 void Tienda::on_btnFacturar_pressed()
 {
     if(checkVacio()==true){
+
     Factura *factura=new Factura(this);
         enviarDatosdeCompra();
+        if(ui->inCedula->text()!="9999999999"){
         factura->datosFactura(ui->inCedula->text(),ui->inNombre->text(),
                               ui->inTelefono->text(),ui->inEmail->text(),
                               ui->inDireccion->toPlainText(),m_detalles);
+        }else{
+            QString nombre= "Consumidor Final";
+            QString telefono="**********";
+            QString email="***********@gmail.com";
+            QString direccion="***************";
+         factura->datosFactura(ui->inCedula->text(),nombre,
+                               telefono,email,
+                               direccion,m_detalles);
+        }
+
+
         factura->ValoresFactura(m_subtotal,iva,total);
     if(contador !=0){
-     factura->cargarDatos();
+    factura->cargarDatos();
     factura->exec();
     limpiar();
 }
-}
 
+}
 }
