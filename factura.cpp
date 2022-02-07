@@ -52,7 +52,7 @@ void Factura::cargarDatos()
 void Factura::on_btnImprimir_clicked()
 {
 
-    QFile archivo("D:/Segundo semestre Salesiana/Programacion orientada a objetos/Nueva carpeta/Tienda/Facturas/"+fechahora);
+    QFile archivo("D:/Segundo semestre Salesiana/Programacion orientada a objetos/Nueva carpeta/Tienda/Facturas/"+fechahora+".txt");
 
     if(archivo.open(QFile::WriteOnly | QFile::Truncate)){
     QTextStream salida(&archivo);

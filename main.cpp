@@ -8,6 +8,7 @@
 
 int main(int argc, char *argv[])
 {
+    qDebug ()<<QLocale::system().name();
     QApplication a(argc, argv);
     // Objeto para manejar las traducciones
         QTranslator traducion;
